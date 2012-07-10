@@ -85,7 +85,7 @@ module PryGithub
         https_url += file_name.gsub(repo.working_dir, '')
         https_url += "#L#{start_line}-L#{start_line + code.lines.to_a.size}"
 
-        puts https_url
+        binding.pry
       end
     end
 

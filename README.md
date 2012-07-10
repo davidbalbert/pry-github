@@ -1,4 +1,4 @@
-# Pry::Github
+# PryGithub
 
 TODO: Write a gem description
 

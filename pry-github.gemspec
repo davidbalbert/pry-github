@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency('pry')
   gem.add_dependency('grit', '~> 2.5.0')
+  gem.add_dependency('launchy', '~> 2.1.0')
 
   gem.add_development_dependency('pry-debundle')
 end

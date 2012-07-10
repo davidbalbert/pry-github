@@ -2,6 +2,7 @@ require "pry-github/version"
 
 require 'pry'
 require 'grit'
+require 'launchy'
 
 require 'uri'
 require 'net/http'
@@ -95,6 +96,10 @@ module PryGithub
         if response.code == "404"
           https_url = https_url.gsub(repo.commit("HEAD").sha, repo.head.name)
         end
+
+        Launchy.open(https_url)
+
+        binding.pry
       end
     end
 

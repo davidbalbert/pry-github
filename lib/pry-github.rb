@@ -4,6 +4,7 @@ require 'pry'
 require 'grit'
 
 require 'uri'
+require 'net/http'
 
 module PryGithub
   module GithubHelpers
@@ -85,8 +86,15 @@ module PryGithub
         https_url += file_name.gsub(repo.working_dir, '')
         https_url += "#L#{start_line}-L#{start_line + code.lines.to_a.size}"
 
+        uri = URI.parse(https_url)
+        response = nil
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          response = http.head(uri.path)
+        end
 
-        binding.pry
+        if response.code == "404"
+          https_url = https_url.gsub(repo.commit("HEAD").sha, repo.head.name)
+        end
       end
     end
 

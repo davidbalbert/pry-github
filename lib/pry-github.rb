@@ -54,6 +54,40 @@ module PryGithub
       raise "No GitHub remote found!" unless gh_url
       gh_url
     end
+
+    def get_github_url(meth, url_type="blob")
+      file_name = meth.source_location.first
+      code, start_line = method_code_from_head(meth)
+
+      git_root = find_git_root(File.dirname(file_name))
+
+      repo = Grit::Repo.new(git_root)
+      gh_url = find_github_remote(repo)
+
+      # ssh urls can't be parsed with URI.parse
+      if gh_url[0..3] == "git@"
+        gh_url = gh_url.gsub(":", "/")
+        gh_url[0..3] = "https://"
+      end
+
+      uri = URI.parse(gh_url)
+      https_url = "https://#{uri.host}#{uri.path}".gsub(".git", "")
+      https_url += "/#{url_type}/#{repo.commit("HEAD").sha}"
+      https_url += file_name.gsub(repo.working_dir, '')
+      https_url += "#L#{start_line}-L#{start_line + code.lines.to_a.size}"
+
+      uri = URI.parse(https_url)
+      response = nil
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        response = http.head(uri.path)
+      end
+
+      if response.code == "404"
+        https_url = https_url.gsub(repo.commit("HEAD").sha, repo.head.name)
+      end
+
+      https_url
+    end
   end
 
   Commands = Pry::CommandSet.new do
@@ -66,44 +100,23 @@ module PryGithub
 
       def process
         meth = method_object
-
-        file_name = meth.source_location.first
-        code, start_line = method_code_from_head(meth)
-
-        git_root = find_git_root(File.dirname(file_name))
-
-        repo = Grit::Repo.new(git_root)
-        gh_url = find_github_remote(repo)
-
-        # ssh urls can't be parsed with URI.parse
-        if gh_url[0..3] == "git@"
-          gh_url = gh_url.gsub(":", "/")
-          gh_url[0..3] = "https://"
-        end
-
-        uri = URI.parse(gh_url)
-        https_url = "https://#{uri.host}#{uri.path}".gsub(".git", "")
-        https_url += "/blob/#{repo.commit("HEAD").sha}"
-        https_url += file_name.gsub(repo.working_dir, '')
-        https_url += "#L#{start_line}-L#{start_line + code.lines.to_a.size}"
-
-        uri = URI.parse(https_url)
-        response = nil
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-          response = http.head(uri.path)
-        end
-
-        if response.code == "404"
-          https_url = https_url.gsub(repo.commit("HEAD").sha, repo.head.name)
-        end
-
-        Launchy.open(https_url)
-
-        binding.pry
+        url = get_github_url(meth)
+        Launchy.open(url)
       end
     end
 
     create_command "gh blame", "Show GitHub blame page for a method" do
+      include GithubHelpers
+
+      def options(opt)
+        method_options(opt)
+      end
+
+      def process
+        meth = method_object
+        url = get_github_url(meth, "blame")
+        Launchy.open(url)
+      end
     end
   end
 end

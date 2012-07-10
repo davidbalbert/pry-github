@@ -27,7 +27,6 @@ module PryGithub
       raise "Can't find #{args[0]} in the repo. Perhaps it hasn't been committed yet." unless start_line
 
       start_line
-      binding.pry
       [Pry.new(:input => StringIO.new(code.lines.to_a[start_line..-1].join)).r(target), start_line + 1]
     end
 
@@ -84,8 +83,9 @@ module PryGithub
         https_url = "https://#{uri.host}#{uri.path}".gsub(".git", "")
         https_url += "/blob/#{repo.commit("HEAD").sha}"
         https_url += file_name.gsub(repo.working_dir, '')
+        https_url += "#L#{start_line}-L#{start_line + code.lines.to_a.size}"
 
-        binding.pry
+        puts https_url
       end
     end
 

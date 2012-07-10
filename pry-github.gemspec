@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "pry-github"
   gem.require_paths = ["lib"]
-  gem.version       = Pry::Github::VERSION
+  gem.version       = PryGithub::VERSION
 
   gem.add_dependency('pry')
   gem.add_dependency('grit', '~> 2.5.0')

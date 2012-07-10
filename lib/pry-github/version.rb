@@ -1,5 +1,3 @@
-class Pry
-  module Github
-    VERSION = "0.0.1"
-  end
+module PryGithub
+  VERSION = "0.0.1"
 end

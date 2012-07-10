@@ -57,7 +57,7 @@ module PryGithub
   end
 
   Commands = Pry::CommandSet.new do
-    create_command "gh-show", "Show GitHub page for a method" do
+    create_command "gh show", "Show GitHub page for a method" do
       include GithubHelpers
 
       def options(opt)
@@ -103,7 +103,7 @@ module PryGithub
       end
     end
 
-    create_command "gh-blame", "Show GitHub blame page for a method" do
+    create_command "gh blame", "Show GitHub blame page for a method" do
     end
   end
 end

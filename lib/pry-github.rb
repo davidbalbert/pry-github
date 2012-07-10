@@ -1,6 +1,6 @@
 require "pry-github/version"
 
-module Pry
+class Pry
   module Github
     # Your code goes here...
   end

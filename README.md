@@ -1,6 +1,6 @@
 # pry-github
 
-pry-github teaches Pry about GitHub. It lets you view your methods in Github whether. You can also open the Github blame view, which I think is quite nice.
+pry-github teaches Pry about GitHub. It lets you view your methods in GitHub whether. You can also open the GitHub blame view, which I think is quite nice.
 
 A bunch of code was taken from [pry-git](https://github.com/pry/pry-git).
 

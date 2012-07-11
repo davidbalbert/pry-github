@@ -1,6 +1,8 @@
-# PryGithub
+# pry-github
 
-TODO: Write a gem description
+pry-github teaches Pry about GitHub. It lets you view your methods in Github whether. You can also open the Github blame view, which I think is quite nice.
+
+A bunch of code was taken from [pry-git](https://github.com/pry/pry-git).
 
 ## Installation
 
@@ -18,7 +20,14 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```
+$ pry
+[1] pry(main)> gh show Foo#bar
+# opens lib/foo.rb on GitHub
+
+[2] pry(main)> gh blame Foo#bar
+# opens the blame page for lib/foo.rb on GitHub
+```
 
 ## Contributing
 
@@ -27,3 +36,7 @@ TODO: Write usage instructions here
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## License
+
+pry-github is licensed under the MIT License. See LICENSE for more info. (c) 2012 David Albert.

@@ -6,6 +6,7 @@ require 'launchy'
 
 require 'uri'
 require 'net/http'
+require 'open3'
 
 module PryGithub
   module GithubHelpers
@@ -26,7 +27,7 @@ module PryGithub
       search_line = meth.source.lines.first.strip
       _, start_line = code.lines.to_a.each_with_index.find { |v, i| v.strip == search_line }
 
-      raise "Can't find #{args[0]} in the repo. Perhaps it hasn't been committed yet." unless start_line
+      raise Pry::CommandError, "Can't find #{args[0]} in the repo. Perhaps it hasn't been committed yet." unless start_line
 
       start_line
       [Pry.new(:input => StringIO.new(code.lines.to_a[start_line..-1].join)).r(target), start_line + 1]
@@ -38,12 +39,13 @@ module PryGithub
     end
 
     def find_git_root(dir)
-      git_root = "."
+      git_root = nil
       Dir.chdir dir do
-        git_root =  `git rev-parse --show-toplevel`.chomp
+        git_root, _ = Open3.capture2e("git rev-parse --show-toplevel")
+        git_root = git_root.chomp
       end
 
-      raise "No associated git repository found!" if git_root =~ /fatal:/
+      raise Pry::CommandError, "No git repository found in #{dir}" if git_root =~ /fatal:/
       git_root
     end
 
@@ -51,7 +53,7 @@ module PryGithub
       remote_urls = repo.remotes.map { |remote| repo.config["remote.#{remote.name.split('/')[0]}.url"] }
       gh_url = remote_urls.find { |url| url =~ /github\.com/ }
 
-      raise "No GitHub remote found!" unless gh_url
+      raise Pry::CommandError, "No GitHub remote found!" unless gh_url
       gh_url
     end
 
